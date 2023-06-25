@@ -12,6 +12,10 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -20,6 +24,7 @@ import org.hibernate.annotations.CreationTimestamp;
 public class BlogEntity {
 
 	@Id
+	@NotNull(message = "Die ID darf nicht null sein")
 	UUID id;
 
 	@Column
@@ -27,8 +32,11 @@ public class BlogEntity {
 	LocalDateTime createdAt;
 
 	@Column(columnDefinition = "text")
+	@NotBlank(message = "Der Titel darf nicht leer sein")
+	@Size(max = 100, message = "Der Titel darf maximal 100 Zeichen lang sein")
 	String title;
 
 	@Column(columnDefinition = "text")
+	@NotBlank(message = "Der Inhalt darf nicht leer sein")
 	String body;
 }

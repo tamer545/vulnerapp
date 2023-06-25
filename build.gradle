@@ -26,7 +26,12 @@ dependencies {
 	runtimeOnly 'org.springframework.boot:spring-boot-starter-actuator'
 	runtimeOnly 'com.h2database:h2'
 
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	implementation 'javax.validation:validation-api:2.0.1.Final'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
 	testRuntimeOnly 'com.h2database:h2'
 }
 
