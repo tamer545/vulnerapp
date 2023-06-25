@@ -42,11 +42,12 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/blog").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/blog").hasAnyAuthority("ADMIN", "USER")
+                        .requestMatchers("/api/admin123").hasAuthority("ADMIN")
                         .requestMatchers("/api/**")
                         .authenticated().anyRequest().permitAll())
                 .csrf()
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .and().build();
+                .and().authenticationProvider(authProvider).build();
     }
 
     @Bean

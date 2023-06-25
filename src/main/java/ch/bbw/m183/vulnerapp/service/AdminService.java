@@ -25,7 +25,7 @@ public class AdminService {
 
 	private final UserRepository userRepository;
 
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public UserEntity createUser(UserEntity newUser){
 		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 		//log.info("New password {}", newUser.getPassword());
@@ -33,19 +33,20 @@ public class AdminService {
 
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public Page<UserEntity> getUsers(Pageable pageable) {
 		return userRepository.findAll(pageable);
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public void deleteUser(String username) {
 		userRepository.deleteById(username);
 	}
 
 	@EventListener(ContextRefreshedEvent.class)
 	public void loadTestUsers() {
-		Stream.of(new UserEntity().setUsername("admin").setFullname("Super Admin").setPassword("super5ecret"),
-						new UserEntity().setUsername("fuu").setFullname("Johanna Doe").setPassword("bar"))
+		Stream.of(new UserEntity().setUsername("admin").setFullname("Super Admin").setPassword("super5ecret").setRole("USER"),
+						new UserEntity().setUsername("fuu").setFullname("Johanna Doe").setPassword("bar").setRole("ADMIN"))
 				.forEach(this::createUser);
 	}
 }

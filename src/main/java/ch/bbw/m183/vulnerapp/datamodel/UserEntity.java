@@ -34,6 +34,10 @@ public class UserEntity implements UserDetails {
 	@Size(min = 8, message = "Passwort muss mindestens 8 Zeichen lang sein")
 	String password;
 
+	@Column
+	@NotBlank(message = "Die Rolle darf nicht leer sein")
+	String role;
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return null;

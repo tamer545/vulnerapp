@@ -13,12 +13,22 @@ class VulnerApplicationTests implements WithAssertions {
     WebTestClient webTestClient;
 
     @Test
-    void contextLoads() {
-    }
-
-    @Test
     void blogsArePublic() {
         webTestClient.get().uri("/api/blog")
                 .exchange().expectStatus().isOk();
     }
+
+    @Test
+    void adminPageIsNotPublic() {
+        webTestClient.get().uri("/api/admin123")
+                .exchange().expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void usersPageIsNotPublic() {
+        webTestClient.get().uri("/api/users")
+                .exchange().expectStatus().isUnauthorized();
+    }
+
+
 }

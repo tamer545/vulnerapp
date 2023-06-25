@@ -1,9 +1,17 @@
 package ch.bbw.m183.vulnerapp.provider;
 
+import ch.bbw.m183.vulnerapp.datamodel.UserEntity;
+import ch.bbw.m183.vulnerapp.repository.UserRepository;
+import ch.bbw.m183.vulnerapp.service.UserDetailsService;
+import org.apache.catalina.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,26 +19,24 @@ import java.util.ArrayList;
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
-    @Override
-    public Authentication authenticate(Authentication authentication)
-            throws AuthenticationException {
 
+    @Autowired
+    UserDetailsService userDetailsService;
+
+    @Override
+    public Authentication authenticate(Authentication authentication){
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        if (shouldAuthenticateAgainstThirdPartySystem()) {
-
-            // use the credentials
-            // and authenticate against the third-party system
-            return new UsernamePasswordAuthenticationToken(
-                    name, password, new ArrayList<>());
-        } else {
-            return null;
+        UserDetails user = userDetailsService.loadUserByUsername(name);
+        if (user == null || !new BCryptPasswordEncoder().matches(password, user.getPassword())) {
+            throw new BadCredentialsException("invalid_username_or_pass");
         }
-    }
+        // use the credentials
+        // and authenticate against the third-party system
+        return new UsernamePasswordAuthenticationToken(
+                    user.getUsername(), user.getPassword(), user.getAuthorities());
 
-    private boolean shouldAuthenticateAgainstThirdPartySystem() {
-        return true;
     }
 
     @Override
