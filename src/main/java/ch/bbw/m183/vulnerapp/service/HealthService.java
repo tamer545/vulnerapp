@@ -7,6 +7,7 @@ import java.util.Scanner;
 import ch.bbw.m183.vulnerapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,15 +18,12 @@ public class HealthService {
 
 	private final UserRepository userRepository;
 
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@SneakyThrows
-	public String health(String host) {
+	public String health() {
 		// lookup the local actuator health endpoint, and login as admin, to get extra details
-		var admin = userRepository.getReferenceById("admin");
-		var url = new URL("http://" + host + "/actuator/health"); // always connect to ourselves here
+		var url = new URL("http://localhost:8080/actuator/health"); // always connect to ourselves here
 		var urlConnection = url.openConnection();
-		var userpass = admin.getUsername() + ":" + admin.getPassword();
-		var basicAuth = "Basic " + Base64.getEncoder().encodeToString(userpass.getBytes());
-		urlConnection.setRequestProperty("Authorization", basicAuth);
 		var s = new Scanner(urlConnection.getInputStream()).useDelimiter("\\A");
 		return s.hasNext() ? s.next() : "";
 	}

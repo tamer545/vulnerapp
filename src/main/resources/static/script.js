@@ -17,6 +17,7 @@ function onLoginSubmit(event) {
     }).then(filterOk)
         .then(response => response.json())
         .then(user => window.sessionStorage.setItem("fullname", user.fullname))
+        .then(() => sessionStorage.setItem('credentials', `${username}:${password}`))
         .then(() => loginCheck());
 }
 
@@ -30,10 +31,18 @@ function onLogoutSubmit(event) {
 function onBlogSubmit(event) {
     const data = {"title": event.target[0].value, "body": event.target[1].value}
     event.preventDefault();
+    console.log(document.cookie.split(`${'XSRF-TOKEN'}=`)[1])
+    const xsrfToken = document.cookie.split(`${'XSRF-TOKEN'}=`)[1]
+    const credentials = sessionStorage.getItem('credentials')
+
+    if(!credentials)
+        return null
     fetch("/api/blog", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "Authorization": "Basic " + btoa(credentials),
+            "X-XSRF-TOKEN": xsrfToken
         },
         body: JSON.stringify(data),
     }).then(filterOk)
